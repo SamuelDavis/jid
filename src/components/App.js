@@ -1,22 +1,30 @@
 import styles from "./App.module.css";
-import data, { photos } from "../data";
-import { useState } from "react";
+import data, { photos, derivePhotoIndex } from "../data";
+import { useState, useEffect } from "react";
 import Post from "./Post";
 import Navigation from "./Navigation";
 
 function App() {
-  const [navIndex, setNavIndex] = useState(0);
+  const [navIndex, setNavIndex] = useState(
+    derivePhotoIndex(window.location.hash) || 0
+  );
   const [postIndex, photoIndex] = photos[navIndex];
 
   function onNavigate(type, e) {
     e.preventDefault();
     e.stopPropagation();
 
-    const nextNavIndex = navIndex + type;
-    if (nextNavIndex in photos) {
-      setNavIndex(nextNavIndex);
-    }
+    window.location.hash = derivePhotoIndex(navIndex + type) || navIndex;
   }
+
+  useEffect(() => {
+    function onHashChange(e) {
+      const nextNavIndex = derivePhotoIndex(e.target.location.hash);
+      if (nextNavIndex !== null) setNavIndex(nextNavIndex);
+    }
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  });
 
   const post = data.posts[postIndex];
   const photo = post.photos[photoIndex];

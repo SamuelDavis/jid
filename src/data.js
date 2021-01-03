@@ -15488,9 +15488,18 @@ data = {
   posts: data.posts.sort((a, b) => new Date(a.date) - new Date(b.date)),
 };
 
-export const photos = data.posts.reduce(
+const photos = data.posts.reduce(
   (acc, post, i) => [...acc, ...post.photos.map((_, j) => [i, j])],
   []
 );
 
+function derivePhotoIndex(index) {
+  const navIndex = parseInt(index.toString().replaceAll(/[^0-9]/g, ""), 10);
+  if (isNaN(navIndex)) return null;
+  if (navIndex < 0) return 0;
+  if (navIndex > photos.length) return photos.length - 1;
+  return navIndex;
+}
+
+export { photos, derivePhotoIndex };
 export default data;
