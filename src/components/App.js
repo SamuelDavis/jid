@@ -3,6 +3,7 @@ import data, { photos, derivePhotoIndex } from "../data";
 import { useState, useEffect } from "react";
 import Post from "./Post";
 import Navigation from "./Navigation";
+import { Helmet } from "react-helmet";
 
 function App() {
   const [navIndex, setNavIndex] = useState(
@@ -28,9 +29,19 @@ function App() {
 
   const post = data.posts[postIndex];
   const photo = post.photos[photoIndex];
+  const title = `Judy is Dead | ${navIndex}`;
+  const url = `${window.location.origin}#${navIndex}`;
 
   return (
     <main className={styles.App}>
+      <Helmet>
+        <title>{title}</title>
+        <meta name="description" content={post.summary} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={post.summary} />
+        <meta property="og:image" content={photo.original_size.url} />
+        <meta property="og:url" content={url} />
+      </Helmet>
       <Navigation onNavigate={onNavigate} />
       <Post post={post} photo={photo} />
     </main>
