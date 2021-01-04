@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/SamuelDavis/jid/static/css/main.201ae7e7.chunk.css",
+    "main.js": "/SamuelDavis/jid/static/js/main.b1f8cd6f.chunk.js",
+    "main.js.map": "/SamuelDavis/jid/static/js/main.b1f8cd6f.chunk.js.map",
+    "runtime-main.js": "/SamuelDavis/jid/static/js/runtime-main.422d61ee.js",
+    "runtime-main.js.map": "/SamuelDavis/jid/static/js/runtime-main.422d61ee.js.map",
+    "static/js/2.8606c395.chunk.js": "/SamuelDavis/jid/static/js/2.8606c395.chunk.js",
+    "static/js/2.8606c395.chunk.js.map": "/SamuelDavis/jid/static/js/2.8606c395.chunk.js.map",
+    "static/js/3.c356e2c8.chunk.js": "/SamuelDavis/jid/static/js/3.c356e2c8.chunk.js",
+    "static/js/3.c356e2c8.chunk.js.map": "/SamuelDavis/jid/static/js/3.c356e2c8.chunk.js.map",
+    "index.html": "/SamuelDavis/jid/index.html",
+    "static/css/main.201ae7e7.chunk.css.map": "/SamuelDavis/jid/static/css/main.201ae7e7.chunk.css.map",
+    "static/js/2.8606c395.chunk.js.LICENSE.txt": "/SamuelDavis/jid/static/js/2.8606c395.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.422d61ee.js",
+    "static/js/2.8606c395.chunk.js",
+    "static/css/main.201ae7e7.chunk.css",
+    "static/js/main.b1f8cd6f.chunk.js"
+  ]
+}
