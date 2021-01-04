@@ -3,7 +3,7 @@ import Photo from "./Photo";
 import { useState } from "react";
 
 function Post({ photo, post }) {
-  const [fitHeight, setFitHeight] = useState(false);
+  const [fitHeight, setFitHeight] = useState(true);
 
   function onFitHeight() {
     setFitHeight(!fitHeight);

@@ -16,10 +16,10 @@
 
     text-transform: uppercase;
     text-decoration: none;
-    background-color: rgba(100, 100, 100, 0.25);
+    background-color: rgba(150, 150, 150, 0.5);
     color: #424C8D;
 
-    opacity: 80%;
+    opacity: 75%;
     border: none;
     outline: none;
     cursor: pointer;
