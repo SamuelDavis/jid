@@ -11,9 +11,8 @@
 .Sidebar {
     display: flex;
     flex-direction: column;
-    flex-basis: 33%;
-    margin-right: 0.5em;
-    padding-right: 0.5em;
+    margin-right: 1em;
+    padding-right: 1em;
     border-right: 1px solid black;
 }
 
