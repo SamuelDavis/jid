@@ -1,0 +1,25 @@
+html {
+  background-color: #1e2036;
+  color: #e2e3e7;
+}
+a:visited {
+  color: #727274;
+}
+
+body {
+  margin: 0;
+}
+
+ol {
+  list-style: none;
+  margin: 0;
+  padding: 3px;
+  display: flex;
+  gap: 3px;
+}
+
+img {
+  object-fit: contain;
+  max-height: 100%;
+  max-width: fit-content;
+}
