@@ -1,5 +1,12 @@
 import data from "./data.json";
-import { useState } from "react";
+import {
+  HTMLProps,
+  PropsWithChildren,
+  PropsWithRef,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 function elementInViewport(el: HTMLElement): boolean {
   const { top, right, bottom, left, height, width } =
@@ -11,8 +18,13 @@ function elementInViewport(el: HTMLElement): boolean {
 type Post = typeof data.posts[number];
 type Photo = Post["photos"][number];
 
-function Photo(props: { photo: Photo; post: Post }) {
-  const { photo, post } = props;
+function Photo(
+  props: Omit<HTMLProps<HTMLImageElement>, "crossOrigin"> & {
+    photo: Photo;
+    post: Post;
+  }
+) {
+  const { photo, post, ...propsRest } = props;
   const { summary } = post;
   const { caption, original_size, alt_sizes } = photo;
   const { url: src, width, height } = original_size;
@@ -23,6 +35,7 @@ function Photo(props: { photo: Photo; post: Post }) {
       return `${url} ${width}w ${height}h`;
     })
     .join(", ");
+
   return (
     <img
       loading={"lazy"}
@@ -31,6 +44,7 @@ function Photo(props: { photo: Photo; post: Post }) {
       width={width}
       height={height}
       srcSet={srcset}
+      {...propsRest}
     />
   );
 }
@@ -48,24 +62,50 @@ const musicCues: [number, number, number][] = [
 ];
 
 function App() {
+  // const [position, setPosition] = useState(0);
   const [index, setIndex] = useState(-1);
+  let n = 0;
   return (
-    <ol>
-      {photos.map(({ id, photo, post }, i) => {
-        return (
-          <li key={i} onClick={() => setIndex((prev) => (prev === i ? -1 : i))}>
-            <span>{`${id} (${i}.)`}</span>
-            <Photo photo={photo} post={post} />
-            {index === i && (
-              <section>
-                <p dangerouslySetInnerHTML={{ __html: post.caption }}></p>
-                <a href={post.post_url}>{post.blog_name}</a>
-              </section>
-            )}
-          </li>
-        );
-      })}
-    </ol>
+    <>
+      {data.posts
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+        .map((post, i) => {
+          return (
+            <article key={i} onClick={() => setIndex(i)}>
+              {post.photos.map((photo, j) => {
+                // const ref = useRef(null);
+                // useEffect(() => {
+                //   const onScroll = () => {
+                //     if (!ref.current) return;
+                //     if (elementInViewport(ref.current)) setPosition(n);
+                //   };
+                //   window.addEventListener("scroll", onScroll);
+                //   return () => window.removeEventListener("scroll", onScroll);
+                // }, [ref]);
+                n++;
+                return (
+                  <Photo
+                    // ref={ref}
+                    key={j}
+                    photo={photo}
+                    post={post}
+                    title={`${i}.${j} (${n}.)`}
+                  />
+                );
+              })}
+              {index === i && (
+                <aside>
+                  <p dangerouslySetInnerHTML={{ __html: post.caption }} />
+                  <footer>
+                    <button onClickCapture={() => setIndex(-1)}>&times;</button>
+                    <a href={post.post_url}>&#8618;{post.blog_name}</a>
+                  </footer>
+                </aside>
+              )}
+            </article>
+          );
+        })}
+    </>
   );
 }
 
