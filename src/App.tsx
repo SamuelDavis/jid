@@ -1,112 +1,113 @@
-import data from "./data.json";
-import {
-  HTMLProps,
-  PropsWithChildren,
-  PropsWithRef,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useRef, useState } from "react";
+import audio from "./../public/audio.mp3";
+import type { Post } from "./types";
+import SummaryModal from "./SummaryModal";
+import Photo from "./Photo";
+import { clamp, elementInFocus } from "./util";
+import { bonus, mainStory, musicCues } from "./data";
 
-function elementInViewport(el: HTMLElement): boolean {
-  const { top, right, bottom, left, height, width } =
-    el.getBoundingClientRect();
-  const { innerHeight, innerWidth } = window;
-  return top >= 0 && left >= 0 && top <= innerHeight && left <= innerWidth;
-}
+export default function () {
+  const [interactive, setInteractive] = useState(false);
+  const [post, setPost] = useState<Post | null>(null);
+  const [focus, setFocus] = useState(0);
+  const [targetVolume, setTargetVolume] = useState(0);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
-type Post = typeof data.posts[number];
-type Photo = Post["photos"][number];
+  useEffect(() => {
+    if (!audioRef.current) return;
+    audioRef.current.volume = 0;
+  }, [audioRef]);
 
-function Photo(
-  props: Omit<HTMLProps<HTMLImageElement>, "crossOrigin"> & {
-    photo: Photo;
-    post: Post;
-  }
-) {
-  const { photo, post, ...propsRest } = props;
-  const { summary } = post;
-  const { caption, original_size, alt_sizes } = photo;
-  const { url: src, width, height } = original_size;
-  const alt = caption || summary;
-  const srcset = alt_sizes
-    .map((size) => {
-      const { url, width, height } = size;
-      return `${url} ${width}w ${height}h`;
-    })
-    .join(", ");
+  useEffect(() => {
+    const onScroll = () => {
+      const photos = document.querySelectorAll("img");
+      for (let i = 0; i < photos.length; i++) {
+        if (focus !== i && elementInFocus(photos[i])) {
+          setFocus(i);
+          setPost(null);
+          break;
+        }
+      }
+    };
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [focus, setFocus, setPost]);
 
-  return (
-    <img
-      loading={"lazy"}
-      src={src}
-      alt={alt}
-      width={width}
-      height={height}
-      srcSet={srcset}
-      {...propsRest}
-    />
-  );
-}
+  useEffect(() => {
+    for (const [first, peak, last] of musicCues) {
+      if (focus >= first && focus <= last) {
+        if (focus < peak) {
+          setTargetVolume((focus - first) / (peak - first));
+        } else if (focus > peak) {
+          setTargetVolume((last - focus) / (last - peak));
+        } else {
+          setTargetVolume(1.0);
+        }
+        return;
+      }
+    }
+    setTargetVolume(0.0);
+  }, [focus, setTargetVolume]);
 
-const photos = data.posts
-  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-  .flatMap((post, i) =>
-    post.photos.map((photo, j) => ({ id: `${i}.${j}`, photo, post }))
-  );
+  useEffect(() => {
+    if (!interactive) return;
+    if (!audioRef.current) return;
+    if (audioRef.current.muted) audioRef.current.muted = false;
+    if (audioRef.current.currentTime < 30) audioRef.current.currentTime = 30;
+    if (audioRef.current.paused || audioRef.current.ended)
+      audioRef.current.play().catch((e) => console.error(e));
+    const diff = targetVolume - audioRef.current.volume;
+    const step = diff / 100;
+    const error = step / 2;
+    const interval = setInterval(() => {
+      if (
+        audioRef.current &&
+        Math.abs(audioRef.current.volume - targetVolume) > Math.abs(error)
+      ) {
+        audioRef.current.volume = clamp(audioRef.current.volume + step, 0, 1);
+      } else {
+        clearInterval(interval);
+      }
+    }, 10);
+    return () => clearInterval(interval);
+  }, [interactive, targetVolume, audioRef]);
 
-const singlePages: number[] = [21];
-const musicCues: [number, number, number][] = [
-  [50, 54, 55],
-  [93, 96, 98],
-];
-
-function App() {
-  // const [position, setPosition] = useState(0);
-  const [index, setIndex] = useState(-1);
-  let n = 0;
   return (
     <>
-      {data.posts
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-        .map((post, i) => {
+      {!interactive && (
+        <button onClick={() => setInteractive(true)}>Load Webcomic</button>
+      )}
+      <audio
+        ref={audioRef}
+        src={audio}
+        muted={true}
+        autoPlay={true}
+        loop={true}
+      />
+      {post && <SummaryModal post={post} onClose={() => setPost(null)} />}
+      <ol>
+        {mainStory.map((props, i) => {
+          const { post } = props;
           return (
-            <article key={i} onClick={() => setIndex(i)}>
-              {post.photos.map((photo, j) => {
-                // const ref = useRef(null);
-                // useEffect(() => {
-                //   const onScroll = () => {
-                //     if (!ref.current) return;
-                //     if (elementInViewport(ref.current)) setPosition(n);
-                //   };
-                //   window.addEventListener("scroll", onScroll);
-                //   return () => window.removeEventListener("scroll", onScroll);
-                // }, [ref]);
-                n++;
-                return (
-                  <Photo
-                    // ref={ref}
-                    key={j}
-                    photo={photo}
-                    post={post}
-                    title={`${i}.${j} (${n}.)`}
-                  />
-                );
-              })}
-              {index === i && (
-                <aside>
-                  <p dangerouslySetInnerHTML={{ __html: post.caption }} />
-                  <footer>
-                    <button onClickCapture={() => setIndex(-1)}>&times;</button>
-                    <a href={post.post_url}>&#8618;{post.blog_name}</a>
-                  </footer>
-                </aside>
-              )}
-            </article>
+            <li key={i} onClick={() => setPost(post)}>
+              <Photo {...props} />
+            </li>
           );
         })}
+      </ol>
+      <details>
+        <summary>Bonus!</summary>
+        <ol>
+          {bonus.map((props, i) => {
+            const { post } = props;
+            return (
+              <li key={i} onClick={() => setPost(post)}>
+                <Photo {...props} />
+              </li>
+            );
+          })}
+        </ol>
+      </details>
     </>
   );
 }
-
-export default App;
