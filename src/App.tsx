@@ -84,29 +84,19 @@ export default function () {
         autoPlay={true}
         loop={true}
       />
-      {post && <SummaryModal post={post} onClose={() => setPost(null)} />}
-      <ol>
+      <article>
+        {post && <SummaryModal post={post} onClose={() => setPost(null)} />}
         {mainStory.map((props, i) => {
           const { post } = props;
-          return (
-            <li key={i} onClick={() => setPost(post)}>
-              <Photo {...props} />
-            </li>
-          );
+          return <Photo key={i} onClick={() => setPost(post)} {...props} />;
         })}
-      </ol>
+      </article>
       <details>
         <summary>Bonus!</summary>
-        <ol>
-          {bonus.map((props, i) => {
-            const { post } = props;
-            return (
-              <li key={i} onClick={() => setPost(post)}>
-                <Photo {...props} />
-              </li>
-            );
-          })}
-        </ol>
+        {bonus.map((props, i) => {
+          const { post } = props;
+          return <Photo key={i} onClick={() => setPost(post)} {...props} />;
+        })}
       </details>
     </>
   );

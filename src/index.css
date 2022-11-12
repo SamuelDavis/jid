@@ -18,14 +18,11 @@ body {
   margin: 0;
 }
 
-ol {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  width: 100%;
+main {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100vw;
 }
 
 aside {
@@ -40,6 +37,13 @@ aside {
   overflow-y: scroll;
   outline: 1px solid var(--text-color);
   outline-offset: -1px;
+}
+
+img {
+  width: 100%;
+  max-width: 100vw;
+  height: fit-content;
+  object-fit: contain;
 }
 
 aside footer {
