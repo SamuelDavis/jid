@@ -1,1 +1,0 @@
-:root{--bg-color: #1e2036;--text-color: #e2e3e7}html{background-color:var(--bg-color);color:var(--text-color)}a,a:visited{color:var(--text-color)}main{display:flex;flex-direction:column;gap:1em}article aside{padding:2em;background-color:var(--bg-color);position:fixed;top:0;left:0;display:grid;place-content:center}aside footer{display:flex;justify-content:space-between}
